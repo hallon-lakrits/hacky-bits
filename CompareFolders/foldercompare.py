@@ -5,6 +5,10 @@ def normalize_unicode(value):
     """Normalize Unicode strings to NFC form."""
     return unicodedata.normalize('NFC', value).lower()
 
+def remove_extension(filename):
+    """Remove file extension for comparison purposes."""
+    return os.path.splitext(filename)[0]
+
 def compare_folder_contents(folder1, folder2):
     try:
         # Walk through the directory trees
@@ -13,12 +17,12 @@ def compare_folder_contents(folder1, folder2):
 
         for root, dirs, files in os.walk(folder1):
             relative_path = normalize_unicode(os.path.relpath(root, folder1).strip())
-            normalized_items = set(normalize_unicode(item) for item in dirs + files)
+            normalized_items = set(normalize_unicode(remove_extension(item)) for item in dirs + files)
             folder1_items[relative_path] = normalized_items
 
         for root, dirs, files in os.walk(folder2):
             relative_path = normalize_unicode(os.path.relpath(root, folder2).strip())
-            normalized_items = set(normalize_unicode(item) for item in dirs + files)
+            normalized_items = set(normalize_unicode(remove_extension(item)) for item in dirs + files)
             folder2_items[relative_path] = normalized_items
 
         # Find all unique relative paths from both folder trees
