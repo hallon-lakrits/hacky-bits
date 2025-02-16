@@ -38,15 +38,15 @@ def compare_folder_contents(folder1, folder2):
             only_in_folder2 = items2 - items1
 
             if only_in_folder1 or only_in_folder2:
-                print(f"Differences in '{path}':")
+                print(f"\nDifferences in '{path}':")
                 if only_in_folder1:
                     print("  Items only in folder 1:")
                     for item in sorted(only_in_folder1):
-                        print(f"    {item}")
+                        print(f"    - {item}")
                 if only_in_folder2:
                     print("  Items only in folder 2:")
                     for item in sorted(only_in_folder2):
-                        print(f"    {item}")
+                        print(f"    - {item}")
 
     except Exception as e:
         print(f"An error occurred while comparing folders: {e}")
