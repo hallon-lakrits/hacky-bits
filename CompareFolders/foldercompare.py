@@ -9,6 +9,8 @@ def remove_extension(filename):
     """Remove file extension for comparison purposes."""
     return os.path.splitext(filename)[0]
 
+IGNORE_LIST = {".ds_store"}  # Files to ignore in the comparison
+
 def compare_folder_contents(folder1, folder2):
     try:
         # Walk through the directory trees
@@ -17,12 +19,12 @@ def compare_folder_contents(folder1, folder2):
 
         for root, dirs, files in os.walk(folder1):
             relative_path = normalize_unicode(os.path.relpath(root, folder1).strip())
-            normalized_items = set(normalize_unicode(remove_extension(item)) for item in dirs + files)
+            normalized_items = set(normalize_unicode(remove_extension(item)) for item in dirs + files if item.lower() not in IGNORE_LIST)
             folder1_items[relative_path] = normalized_items
 
         for root, dirs, files in os.walk(folder2):
             relative_path = normalize_unicode(os.path.relpath(root, folder2).strip())
-            normalized_items = set(normalize_unicode(remove_extension(item)) for item in dirs + files)
+            normalized_items = set(normalize_unicode(remove_extension(item)) for item in dirs + files if item.lower() not in IGNORE_LIST)
             folder2_items[relative_path] = normalized_items
 
         # Find all unique relative paths from both folder trees
