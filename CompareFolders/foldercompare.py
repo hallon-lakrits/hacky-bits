@@ -48,7 +48,7 @@ def compare_folder_contents(folder1, folder2):
             only_in_folder2 = items2 - items1
 
             if only_in_folder1 or only_in_folder2:
-                print(f"\nDifferences in '{path}':")
+                print(f"\nDifferences in '\033[34m{path}\033[0m':")
                 print_differences(only_in_folder1, 1)
                 print_differences(only_in_folder2, 2)
 
