@@ -17,7 +17,18 @@ def print_differences(items, folder_number):
             print(f"    - {color}{item}\033[0m")  # Blue for directories, Green for files
 
 
-IGNORE_LIST = {".ds_store"}  # Files to ignore in the comparison
+IGNORE_LIST = {"ds_store"}  # Files to ignore in the comparison (sanitized, lowercase, no leading dot)
+
+def sanitize_name(name):
+    """Strip leading '.' and '_' characters from filenames/directories."""
+    s = name
+    while s and s[0] in "._":
+        s = s[1:]
+    return s
+
+def is_ignored(name):
+    """Check if a name (before sanitization) corresponds to an ignored base name."""
+    return sanitize_name(name).lower() in IGNORE_LIST
 
 def compare_folder_contents(folder1, folder2):
     try:
@@ -27,14 +38,14 @@ def compare_folder_contents(folder1, folder2):
 
         for root, dirs, files in os.walk(folder1):
             relative_path = normalize_unicode(os.path.relpath(root, folder1).strip())
-            normalized_items = {(normalize_unicode(remove_extension(item)), True) for item in dirs if item.lower() not in IGNORE_LIST}
-            normalized_items.update({(normalize_unicode(remove_extension(item)), False) for item in files if item.lower() not in IGNORE_LIST})
+            normalized_items = {(normalize_unicode(sanitize_name(remove_extension(item))), True) for item in dirs if not is_ignored(item)}
+            normalized_items.update({(normalize_unicode(sanitize_name(remove_extension(item))), False) for item in files if not is_ignored(item)})
             folder1_items[relative_path] = normalized_items
 
         for root, dirs, files in os.walk(folder2):
             relative_path = normalize_unicode(os.path.relpath(root, folder2).strip())
-            normalized_items = {(normalize_unicode(remove_extension(item)), True) for item in dirs if item.lower() not in IGNORE_LIST}
-            normalized_items.update({(normalize_unicode(remove_extension(item)), False) for item in files if item.lower() not in IGNORE_LIST})
+            normalized_items = {(normalize_unicode(sanitize_name(remove_extension(item))), True) for item in dirs if not is_ignored(item)}
+            normalized_items.update({(normalize_unicode(sanitize_name(remove_extension(item))), False) for item in files if not is_ignored(item)})
             folder2_items[relative_path] = normalized_items
 
         # Find all unique relative paths from both folder trees
