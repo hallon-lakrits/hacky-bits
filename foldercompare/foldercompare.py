@@ -51,7 +51,25 @@ def compare_folder_contents(folder1, folder2):
         # Find all unique relative paths from both folder trees
         all_paths = set(folder1_items.keys()).union(set(folder2_items.keys()))
 
+        # If a directory exists in one folder but not in the other, do not compare its children.
+        # Keep the parent directory comparison (to report the missing directory), but exclude deeper paths.
+        dirs_only_in_folder1 = set(folder1_items.keys()) - set(folder2_items.keys())
+        dirs_only_in_folder2 = set(folder2_items.keys()) - set(folder1_items.keys())
+
+        excluded_subpaths = set()
+        for d in dirs_only_in_folder1.union(dirs_only_in_folder2):
+            for p in all_paths:
+                # skip deeper paths under the directory that is only on one side
+                if p != d and p.startswith(d + os.sep):
+                    excluded_subpaths.add(p)
+
+        if excluded_subpaths:
+            all_paths -= excluded_subpaths
+
         for path in sorted(all_paths):
+            # If this directory itself is present only in one side, don't compare its children (skip it).
+            if path in dirs_only_in_folder1 or path in dirs_only_in_folder2:
+                continue
             items1 = folder1_items.get(path, set())
             items2 = folder2_items.get(path, set())
 
